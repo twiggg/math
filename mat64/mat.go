@@ -1,4 +1,4 @@
-package m64
+package mat
 
 //mat "gonum.org/v1/gonum/mat"
 
@@ -13,6 +13,22 @@ type M64 struct {
 	r    int
 	c    int
 	data []float64
+}
+
+//Dims returns the number of rows and colomns
+func (m *M64) Dims() (int, int) {
+	if m == nil {
+		return 0, 0
+	}
+	return m.r, m.c
+}
+
+//Size returns the size of the data array: rows*colomns
+func (m *M64) Size() int {
+	if m == nil {
+		return 0
+	}
+	return m.r * m.c
 }
 
 //NewM64 returns a new M64 instance, initialized with data if len==r*c
@@ -51,6 +67,12 @@ func (m *M64) Valid() bool {
 }
 
 func (m *M64) index(i, j int) int {
+	if i < 0 || j < 0 {
+		return 0
+	}
+	if i == 0 {
+		return j
+	}
 	return m.c*i + j
 }
 

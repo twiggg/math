@@ -1,4 +1,4 @@
-package m64
+package mat
 
 import "fmt"
 
