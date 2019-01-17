@@ -1,0 +1,207 @@
+package m64
+
+import (
+	"fmt"
+	"testing"
+
+	"github.com/twiggg/tester"
+)
+
+func TestSmallAdd(t *testing.T) {
+	te := tester.New(t)
+	tests := []struct {
+		m    *M64
+		n    *M64
+		dest *M64
+		res  *M64
+		err  error
+	}{
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), NewM64(3, 3, nil), NewM64(3, 3, nil), nil},
+		{nil, NewM64(3, 3, nil), nil, nil, fmt.Errorf("m is nil")},
+		{NewM64(3, 3, nil), nil, nil, nil, fmt.Errorf("n is nil")},
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), nil, nil, fmt.Errorf("dest is nil")},
+		{NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(2, 3, nil), NewM64(2, 3, nil), fmt.Errorf("m,n rows not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 3, nil), NewM64(2, 3, nil), NewM64(3, 3, nil), fmt.Errorf("m,n colomns not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(2, 3, nil), fmt.Errorf("m,dest rows not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(3, 3, nil), NewM64(2, 3, nil), fmt.Errorf("m,dest colomns not equal")},
+		{NewM64(3, 2, []float64{1, 1, 1, 1, 1, 1}), NewM64(3, 2, []float64{2, 2, 2, 1, 1, 1}), NewM64(3, 2, []float64{3, 3, 3, 2, 2, 2}), NewM64(3, 2, []float64{3, 3, 3, 2, 2, 2}), nil},
+	}
+
+	for ind, test := range tests {
+		err := add(test.m, test.n, test.dest)
+		te.CompareError(ind, test.err, err)
+		if err == nil {
+			te.DeepEqual(ind, "res", test.res, test.dest)
+		}
+	}
+}
+
+func TestSmallSub(t *testing.T) {
+	te := tester.New(t)
+	tests := []struct {
+		m    *M64
+		n    *M64
+		dest *M64
+		res  *M64
+		err  error
+	}{
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), NewM64(3, 3, nil), NewM64(3, 3, nil), nil},
+		{nil, NewM64(3, 3, nil), nil, nil, fmt.Errorf("m is nil")},
+		{NewM64(3, 3, nil), nil, nil, nil, fmt.Errorf("n is nil")},
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), nil, nil, fmt.Errorf("dest is nil")},
+		{NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(2, 3, nil), NewM64(2, 3, nil), fmt.Errorf("m,n rows not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 3, nil), NewM64(2, 3, nil), NewM64(3, 3, nil), fmt.Errorf("m,n colomns not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(2, 3, nil), fmt.Errorf("m,dest rows not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(3, 3, nil), NewM64(2, 3, nil), fmt.Errorf("m,dest colomns not equal")},
+		{NewM64(3, 2, []float64{1, 1, 1, 1, 1, 1}), NewM64(3, 2, []float64{2, 2, 2, 1, 1, 1}), NewM64(3, 2, []float64{-1, -1, -1, 0, 0, 0}), NewM64(3, 2, []float64{-1, -1, -1, 0, 0, 0}), nil},
+	}
+
+	for ind, test := range tests {
+		err := sub(test.m, test.n, test.dest)
+		te.CompareError(ind, test.err, err)
+		if err == nil {
+			te.DeepEqual(ind, "res", test.res, test.dest)
+		}
+	}
+}
+
+func TestSmallMul(t *testing.T) {
+	te := tester.New(t)
+	tests := []struct {
+		m    *M64
+		n    *M64
+		dest *M64
+		res  *M64
+		err  error
+	}{
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), NewM64(3, 3, nil), NewM64(3, 3, nil), nil},
+		{nil, NewM64(3, 3, nil), nil, nil, fmt.Errorf("m is nil")},
+		{NewM64(3, 3, nil), nil, nil, nil, fmt.Errorf("n is nil")},
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), nil, nil, fmt.Errorf("dest is nil")},
+		{NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(2, 3, nil), NewM64(2, 3, nil), fmt.Errorf("m,dest rows not equal")},
+		{NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(3, 2, nil), NewM64(3, 3, nil), fmt.Errorf("n,dest colomns not equal")},
+		{NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(2, 3, nil), NewM64(3, 3, nil), fmt.Errorf("m,dest rows not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 3, nil), NewM64(3, 2, nil), NewM64(3, 3, nil), fmt.Errorf("m colomns != n rows")},
+		{NewM64(3, 2, []float64{1, 1, 1, 1, 1, 1}), NewM64(2, 3, []float64{1, 1, 1, 1, 1, 1}), NewM64(3, 3, []float64{2, 2, 2, 2, 2, 2, 2, 2, 2}), NewM64(3, 3, []float64{2, 2, 2, 2, 2, 2, 2, 2, 2}), nil},
+	}
+
+	for ind, test := range tests {
+		err := mul(test.m, test.n, test.dest)
+		te.CompareError(ind, test.err, err)
+		if err == nil {
+			te.DeepEqual(ind, "res", test.res, test.dest)
+		}
+	}
+}
+
+func TestSmallMapElem(t *testing.T) {
+	f0 := func(valm, valn float64) float64 {
+		return 0.0
+	}
+	f1 := func(valm, valn float64) float64 {
+		return valm * valn
+	}
+	te := tester.New(t)
+	tests := []struct {
+		m    *M64
+		n    *M64
+		dest *M64
+		fn   func(valm, valn float64) float64
+		res  *M64
+		err  error
+	}{
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), NewM64(3, 3, nil), f0, NewM64(3, 3, nil), nil},
+		{nil, NewM64(3, 3, nil), NewM64(3, 3, nil), f0, nil, fmt.Errorf("m is nil")},
+		{NewM64(3, 3, nil), nil, NewM64(3, 3, nil), f0, nil, fmt.Errorf("n is nil")},
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), nil, f0, nil, fmt.Errorf("dest is nil")},
+		{NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(3, 2, nil), f0, nil, fmt.Errorf("m,n rows not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 3, nil), NewM64(3, 2, nil), f0, nil, fmt.Errorf("m,n colomns not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(2, 3, nil), f0, nil, fmt.Errorf("m,dest rows not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(3, 3, nil), f0, nil, fmt.Errorf("m,dest colomns not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(3, 2, nil), f0, NewM64(3, 2, []float64{}), nil},
+		{NewM64(3, 2, []float64{1, 1, 1, 1, 1, 1}), NewM64(3, 2, []float64{1, 2, 3, 4, 5, 6}), NewM64(3, 2, nil), f1, NewM64(3, 2, []float64{1, 2, 3, 4, 5, 6}), nil},
+	}
+
+	for ind, test := range tests {
+		err := mapElem(test.m, test.n, test.dest, test.fn)
+		te.CompareError(ind, test.err, err)
+		if err == nil {
+			te.DeepEqual(ind, "res", test.res, test.dest)
+		}
+	}
+}
+
+func TestSmallMapElemIJ(t *testing.T) {
+	f0 := func(i, j int) float64 {
+		return 0.0
+	}
+	f1 := func(i, j int) float64 {
+		return float64(i * j)
+	}
+	te := tester.New(t)
+	tests := []struct {
+		m    *M64
+		n    *M64
+		dest *M64
+		fn   func(i, j int) float64
+		res  *M64
+		err  error
+	}{
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), NewM64(3, 3, nil), f0, NewM64(3, 3, nil), nil},
+		{nil, NewM64(3, 3, nil), NewM64(3, 3, nil), f0, nil, fmt.Errorf("m is nil")},
+		//{NewM64(3, 3, nil), nil, NewM64(3, 3, nil), f0, nil, fmt.Errorf("n is nil")},
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), nil, f0, nil, fmt.Errorf("dest is nil")},
+		//{NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(3, 2, nil), f0, nil, fmt.Errorf("m,n rows not equal")},
+		//{NewM64(3, 2, nil), NewM64(3, 3, nil), NewM64(3, 2, nil), f0, nil, fmt.Errorf("m,n colomns not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(2, 3, nil), f0, nil, fmt.Errorf("m,dest rows not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(3, 3, nil), f0, nil, fmt.Errorf("m,dest colomns not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(3, 2, nil), f0, NewM64(3, 2, []float64{0, 0, 0, 0, 0, 0}), nil},
+		{NewM64(3, 2, []float64{1, 1, 1, 1, 1, 1}), NewM64(3, 2, []float64{1, 2, 3, 4, 5, 6}), NewM64(3, 2, nil), f1, NewM64(3, 2, []float64{0, 0, 0, 1, 0, 2}), nil},
+		{NewM64(2, 3, []float64{1, 1, 1, 1, 1, 1}), NewM64(2, 3, []float64{1, 2, 3, 4, 5, 6}), NewM64(2, 3, nil), f1, NewM64(2, 3, []float64{0, 0, 0, 0, 1, 2}), nil},
+	}
+
+	for ind, test := range tests {
+		err := mapElemIJ(test.m, test.dest, test.fn)
+		te.CompareError(ind, test.err, err)
+		if err == nil {
+			te.DeepEqual(ind, "res", test.res, test.dest)
+		}
+	}
+}
+
+func TestSmallMapElemVal(t *testing.T) {
+	f0 := func(val float64) float64 {
+		return 0.0
+	}
+	f1 := func(val float64) float64 {
+		return val * 2.0
+	}
+	te := tester.New(t)
+	tests := []struct {
+		m    *M64
+		n    *M64
+		dest *M64
+		fn   func(val float64) float64
+		res  *M64
+		err  error
+	}{
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), NewM64(3, 3, nil), f0, NewM64(3, 3, nil), nil},
+		{nil, NewM64(3, 3, nil), NewM64(3, 3, nil), f0, nil, fmt.Errorf("m is nil")},
+		//{NewM64(3, 3, nil), nil, NewM64(3, 3, nil), f0, nil, fmt.Errorf("n is nil")},
+		{NewM64(3, 3, nil), NewM64(3, 3, nil), nil, f0, nil, fmt.Errorf("dest is nil")},
+		//{NewM64(3, 2, nil), NewM64(2, 3, nil), NewM64(3, 2, nil), f0, nil, fmt.Errorf("m,n rows not equal")},
+		//{NewM64(3, 2, nil), NewM64(3, 3, nil), NewM64(3, 2, nil), f0, nil, fmt.Errorf("m,n colomns not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(2, 3, nil), f0, nil, fmt.Errorf("m,dest rows not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(3, 3, nil), f0, nil, fmt.Errorf("m,dest colomns not equal")},
+		{NewM64(3, 2, nil), NewM64(3, 2, nil), NewM64(3, 2, nil), f0, NewM64(3, 2, []float64{0, 0, 0, 0, 0, 0}), nil},
+		{NewM64(3, 2, []float64{1, 1, 1, 2, 2, 2}), NewM64(3, 2, []float64{1, 2, 3, 4, 5, 6}), NewM64(3, 2, nil), f1, NewM64(3, 2, []float64{2, 2, 2, 4, 4, 4}), nil},
+	}
+
+	for ind, test := range tests {
+		err := mapElemVal(test.m, test.dest, test.fn)
+		te.CompareError(ind, test.err, err)
+		if err == nil {
+			te.DeepEqual(ind, "res", test.res, test.dest)
+		}
+	}
+}

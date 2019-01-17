@@ -1,9 +1,6 @@
 package m64
 
-import (
-	"fmt"
-	//mat "gonum.org/v1/gonum/mat"
-)
+//mat "gonum.org/v1/gonum/mat"
 
 /*
 func useless() *mat.Dense {
@@ -19,12 +16,12 @@ type M64 struct {
 }
 
 //NewM64 returns a new M64 instance, initialized with data if len==r*c
-func NewM64(r, c int, data []float64) (*M64, error) {
+func NewM64(r, c int, data []float64) *M64 {
 	if r <= 0 {
-		return nil, fmt.Errorf("r must be >=1")
+		r = 1
 	}
 	if c <= 0 {
-		return nil, fmt.Errorf("c must be >=1")
+		c = 1
 	}
 	m := &M64{r: r, c: c}
 	if len(data) == r*c {
@@ -32,7 +29,7 @@ func NewM64(r, c int, data []float64) (*M64, error) {
 	} else {
 		m.data = make([]float64, int(r*c))
 	}
-	return m, nil
+	return m
 }
 
 //Valid returns false if m is nil, and initiates with empty data of size=r*c if invalid size
