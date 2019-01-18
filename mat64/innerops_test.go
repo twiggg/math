@@ -86,7 +86,7 @@ func TestSmallDotProd(t *testing.T) {
 	}
 
 	for ind, test := range tests {
-		err := dotprod(test.m, test.n, test.dest)
+		err := mul(test.m, test.n, test.dest)
 		te.CompareError(ind, test.err, err)
 		if err == nil {
 			te.DeepEqual(ind, "res", test.res, test.dest)
@@ -101,6 +101,28 @@ func TestSmallDotProd(t *testing.T) {
 		res.Mul(w, x)
 		fmt.Printf("w:\n%+v\n\nx:\n%+v\n\nres:\n%+v\n", w, x, res)
 	*/
+}
+
+func BenchmarkSmallDotProd500x500x1(b *testing.B) {
+	r, c, c2 := 500, 500, 1
+	data := make([]float64, r*c)
+	for i := 0; i < r*c; i++ {
+		data[i] = float64(i)*100 + 1
+	}
+	data2 := make([]float64, c*c2)
+	for i := 0; i < c*c2; i++ {
+		data2[i] = float64(i)*100 + 4
+	}
+	m := NewM64(r, c, data)
+	n := NewM64(c, c2, data2)
+	dest := NewM64(r, c2, nil)
+	// run the function b.N times
+	//t0 := time.Now()
+	for k := 0; k < b.N; k++ {
+		//t0 = time.Now()
+		mul(m, n, dest)
+		//fmt.Printf("%s\n", time.Since(t0))
+	}
 }
 
 func TestSmallMapElem(t *testing.T) {

@@ -20,7 +20,7 @@ func sub(m, n, dest *M64) error {
 	return nil
 }
 
-func dotprod(m, n, dest *M64) error {
+func mul(m, n, dest *M64) error {
 	if err := dotSize(m, n, dest); err != nil {
 		return err
 	}

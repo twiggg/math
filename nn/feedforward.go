@@ -53,3 +53,42 @@ func (ff *FeedForward) SetLayers(configs ...*LayerConfig) error {
 	ff.states = make([]*mat.M64, n2)
 	return nil
 }
+
+//Feed feeds data forward from input, returns output layer's state
+func (ff *FeedForward) Feed(input *mat.M64) (*mat.M64, error) {
+	in := input
+	var out *mat.M64
+	if ff.keepStates {
+		ff.states = make([]*mat.M64, len(ff.layers))
+	}
+	for i, l := range ff.layers {
+		out, err := l.ComputeWith(in)
+		if err != nil {
+			return nil, fmt.Errorf("layer[%d]: %s", i, err.Error())
+		}
+		if ff.keepStates {
+			ff.states[i] = out
+		}
+		in = out
+	}
+	return out, nil
+}
+
+//GetState returns the output values of a layer if keepStates==true or an error
+func (ff *FeedForward) GetState(layerInd int) (*mat.M64, error) {
+	if ff == nil {
+		return nil, fmt.Errorf("network is nil")
+	}
+	l := len(ff.states)
+	if l == 0 {
+		return nil, fmt.Errorf("no states")
+	}
+	if layerInd < 0 || layerInd > l-1 {
+		return nil, fmt.Errorf("layer index must be between %d and %d", 0, l-1)
+	}
+	s := ff.states[layerInd]
+	if s == nil {
+		return nil, fmt.Errorf("state is nil")
+	}
+	return s, nil
+}

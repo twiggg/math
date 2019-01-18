@@ -20,12 +20,12 @@ func Sub(m, n *M64) (*M64, error) {
 	return res, nil
 }
 
-//DotProduct returns a new matrix as the dot product of m and n
-func DotProduct(m, n *M64) (*M64, error) {
+//Mul returns a new matrix as the dot product of m and n
+func Mul(m, n *M64) (*M64, error) {
 	r, _ := m.Dims()
 	_, c1 := n.Dims()
 	res := NewM64(r, c1, nil)
-	if err := dotprod(m, n, res); err != nil {
+	if err := mul(m, n, res); err != nil {
 		return nil, err
 	}
 	return res, nil

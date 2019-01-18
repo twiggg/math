@@ -24,7 +24,7 @@ func TestDotProd(t *testing.T) {
 	}
 
 	for ind, test := range tests {
-		res, err := DotProduct(test.m, test.n)
+		res, err := Mul(test.m, test.n)
 		te.CompareError(ind, test.err, err)
 		if err == nil {
 			te.DeepEqual(ind, "res", test.res, res)

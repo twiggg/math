@@ -91,7 +91,7 @@ func (l *layer) ComputeWith(input *mat.M64) (*mat.M64, error) {
 
 //wxpb computes the dot product of w and x then adds b
 func wxpb(w, x, b *mat.M64) (*mat.M64, error) {
-	res, err := mat.DotProduct(w, x)
+	res, err := mat.Mul(w, x)
 	if err != nil {
 		return nil, fmt.Errorf("w*x failed: %s", err.Error())
 	}
