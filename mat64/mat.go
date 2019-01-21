@@ -95,3 +95,18 @@ func (m *M64) Add(n *M64) error {
 func (m *M64) Sub(n *M64) error {
 	return sub(m, n, m)
 }
+
+//Mul return mxn (matrix product)
+func (m *M64) Mul(n *M64) error {
+	return mul(m, n, m)
+}
+
+//MulElem return mxn (matrix product)
+func (m *M64) MulElem(n *M64) error {
+	return mulElem(m, n, m)
+}
+
+//MapElem applies fn to each element of the matrix
+func (m *M64) MapElem(fn func(x float64) float64) error {
+	return mapElemVal(m, m, fn)
+}

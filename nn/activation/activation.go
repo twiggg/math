@@ -77,3 +77,5 @@ func NewDerivLeakyRelu(alpha float64) func(x float64) float64 {
 		return alpha
 	}
 }
+
+//Softmax?

@@ -31,6 +31,16 @@ func Mul(m, n *M64) (*M64, error) {
 	return res, nil
 }
 
+//MulElem returns a new matrix as the dot product of m and n
+func MulElem(m, n *M64) (*M64, error) {
+	r, c := m.Dims()
+	res := NewM64(r, c, nil)
+	if err := mulElem(m, n, res); err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 //MapElem applies function fn to each elem of m
 func MapElem(m *M64, fn func(x float64) float64) (*M64, error) {
 	res := NewM64(m.r, m.c, nil)

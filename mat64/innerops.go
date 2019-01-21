@@ -38,6 +38,20 @@ func mul(m, n, dest *M64) error {
 	return nil
 }
 
+//element wise multiplication
+func mulElem(m, n, dest *M64) error {
+	if err := sameSize(m, n, dest); err != nil {
+		return err
+	}
+	i, j := 0, 0
+	for i = 0; i < m.r; i++ {
+		for j = 0; j < n.c; j++ {
+			dest.Set(i, j, m.At(i, j)*n.At(i, j))
+		}
+	}
+	return nil
+}
+
 func mapElem(m, n, dest *M64, fn func(valm, valn float64) float64) error {
 	if err := sameSize(m, n, dest); err != nil {
 		return err

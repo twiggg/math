@@ -6,8 +6,8 @@ import (
 	"github.com/twiggg/math/mat64"
 )
 
-//FeedForward represents a simple feed forward neural network
-type FeedForward struct {
+//FFN represents a simple feed forward neural network
+type FFN struct {
 	inSize     int
 	outSize    int
 	layers     []*layer
@@ -15,12 +15,12 @@ type FeedForward struct {
 	keepStates bool
 }
 
-//NewFeedForward returns a new instance of FeedForward Neural Network, with no layers
-func NewFeedForward(inSize int, keepStates bool) (*FeedForward, error) {
+//NewFFN returns a new instance of FeedForward Neural Network, with no layers
+func NewFFN(inSize int, keepStates bool) (*FFN, error) {
 	if inSize < 1 {
 		return nil, fmt.Errorf("minimum input size is 1")
 	}
-	ff := &FeedForward{
+	ff := &FFN{
 		inSize:     inSize,
 		outSize:    inSize,
 		keepStates: keepStates,
@@ -29,7 +29,7 @@ func NewFeedForward(inSize int, keepStates bool) (*FeedForward, error) {
 }
 
 //SetLayers sets neuron layers connected via w,b,fn. Must have at least 1 layer
-func (ff *FeedForward) SetLayers(configs ...*LayerConfig) error {
+func (ff *FFN) SetLayers(configs ...*LayerConfig) error {
 	var err error
 	n := len(configs)
 	if n < 1 {
@@ -46,7 +46,7 @@ func (ff *FeedForward) SetLayers(configs ...*LayerConfig) error {
 		if err = l.Validate(); err != nil {
 			return fmt.Errorf("configs[%d]: %s", i, err.Error())
 		}
-		layers[i] = newLayer(prevSize, l.Size, l.Fn)
+		layers[i] = newLayer(prevSize, l.Size, l.Fn, l.Deriv)
 		prevSize = l.Size
 	}
 	ff.layers = layers
@@ -55,7 +55,7 @@ func (ff *FeedForward) SetLayers(configs ...*LayerConfig) error {
 }
 
 //Feed feeds data forward from input, returns output layer's state
-func (ff *FeedForward) Feed(input *mat.M64) (*mat.M64, error) {
+func (ff *FFN) Feed(input *mat.M64) (*mat.M64, error) {
 	in := input
 	var out *mat.M64
 	if ff.keepStates {
@@ -75,7 +75,7 @@ func (ff *FeedForward) Feed(input *mat.M64) (*mat.M64, error) {
 }
 
 //GetState returns the output values of a layer if keepStates==true or an error
-func (ff *FeedForward) GetState(layerInd int) (*mat.M64, error) {
+func (ff *FFN) GetState(layerInd int) (*mat.M64, error) {
 	if ff == nil {
 		return nil, fmt.Errorf("network is nil")
 	}

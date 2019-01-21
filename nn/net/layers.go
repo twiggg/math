@@ -12,8 +12,9 @@ type ActivationFunc func(x float64) float64
 //LayerConfig holds info to define a new layer
 type LayerConfig struct {
 	//InSize  int
-	Size int
-	Fn   ActivationFunc
+	Size  int
+	Fn    ActivationFunc
+	Deriv ActivationFunc
 }
 
 //Validate checks configuration data
@@ -24,17 +25,24 @@ func (l *LayerConfig) Validate() error {
 	if l.Size <= 0 {
 		return fmt.Errorf("size must be >0")
 	}
+	if l.Fn == nil {
+		return fmt.Errorf("activation function is nil")
+	}
+	if l.Deriv == nil {
+		return fmt.Errorf("derivative of activation function is nil")
+	}
 	return nil
 }
 
 //newLayer returns a new Level
-func newLayer(inSize int, outSize int, fn ActivationFunc) *layer {
+func newLayer(inSize int, outSize int, fn ActivationFunc, deriv ActivationFunc) *layer {
 	return &layer{
 		inSize:  inSize,
 		outSize: outSize,
 		w:       mat.NewM64(outSize, inSize, nil),
 		b:       mat.NewM64(outSize, 1, nil),
 		fn:      fn,
+		deriv:   deriv,
 	}
 }
 
@@ -45,6 +53,53 @@ type layer struct {
 	w       *mat.M64
 	b       *mat.M64
 	fn      ActivationFunc
+	deriv   ActivationFunc
+}
+
+func (l *layer) Validate() error {
+	if l == nil {
+		return fmt.Errorf("layer is nil")
+	}
+	if l.fn == nil {
+		return fmt.Errorf("activation function is nil")
+	}
+	if l.deriv == nil {
+		return fmt.Errorf("derivative of activation function is nil")
+	}
+	if l.inSize <= 0 {
+		return fmt.Errorf("input size must be >0")
+	}
+	if l.outSize <= 0 {
+		return fmt.Errorf("output size must be >0")
+	}
+	return nil
+}
+
+func (l *layer) IsUsable() error {
+	if err := l.Validate(); err != nil {
+		return err
+	}
+	if l.w == nil {
+		return fmt.Errorf("weight matrix is nil")
+	}
+	if l.b == nil {
+		return fmt.Errorf("bias vector is nil")
+	}
+	r, c := l.w.Dims()
+	if r != l.outSize {
+		return fmt.Errorf("weight matrix should have %d rows not %d", l.outSize, r)
+	}
+	if c != l.inSize {
+		return fmt.Errorf("weight matrix should have %d colomns not %d", l.inSize, c)
+	}
+	r, c = l.b.Dims()
+	if r != l.outSize {
+		return fmt.Errorf("bias vector should have %d rows not %d", l.outSize, r)
+	}
+	if c != 1 {
+		return fmt.Errorf("bias vector should have 1 colomns not %d", c)
+	}
+	return nil
 }
 
 func (l *layer) dataSize() int {
@@ -77,7 +132,6 @@ func (l *layer) UpdateData(data []float64) error {
 			}
 		}
 	}
-
 	return nil
 }
 
